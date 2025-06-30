@@ -52,6 +52,8 @@ export function HyperText({
   const [isAnimating, setIsAnimating] = useState(false);
   const iterationCount = useRef(0);
   const elementRef = useRef<HTMLElement>(null);
+  const isNumber = !isNaN(Number(children));
+  const targetNumber = isNumber ? Number(children) : 0;
 
   const handleAnimationTrigger = () => {
     if (animateOnHover && !isAnimating) {
@@ -62,6 +64,11 @@ export function HyperText({
 
   // Handle animation start based on view or delay
   useEffect(() => {
+    if (isNumber) {
+      // For numbers, initialize with "100"
+      setDisplayText("100".split(""));
+    }
+    
     if (!startOnView) {
       const startTimeout = setTimeout(() => {
         setIsAnimating(true);
@@ -92,7 +99,7 @@ export function HyperText({
   useEffect(() => {
     if (!isAnimating) return;
 
-    const maxIterations = children.length;
+    const maxIterations = isNumber ? 100 : children.length;
     const startTime = performance.now();
     let animationFrameId: number;
 
@@ -102,15 +109,22 @@ export function HyperText({
 
       iterationCount.current = progress * maxIterations;
 
-      setDisplayText((currentText) =>
-        currentText.map((letter, index) =>
-          letter === " "
-            ? letter
-            : index <= iterationCount.current
-              ? children[index]
-              : characterSet[getRandomInt(characterSet.length)],
-        ),
-      );
+      if (isNumber) {
+        // For numbers: count down from 100 to target
+        const currentValue = Math.max(targetNumber, Math.floor(100 - iterationCount.current));
+        setDisplayText(currentValue.toString().split(""));
+      } else {
+        // For text: original scramble effect
+        setDisplayText((currentText) =>
+          currentText.map((letter, index) =>
+            letter === " "
+              ? letter
+              : index <= iterationCount.current
+                ? children[index]
+                : characterSet[getRandomInt(characterSet.length)],
+          ),
+        );
+      }
 
       if (progress < 1) {
         animationFrameId = requestAnimationFrame(animate);
@@ -127,7 +141,7 @@ export function HyperText({
   return (
     <MotionComponent
       ref={elementRef}
-      className={cn("overflow-hidden py-2 text-4xl font-bold", className)}
+      className={cn("overflow-hidden py-2", className)}
       onMouseEnter={handleAnimationTrigger}
       {...props}
     >

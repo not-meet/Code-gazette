@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { CodeBlock } from "./ui/code-block";
 
 interface BlogContent {
@@ -46,7 +47,7 @@ export function Preview({ title, contents, authorName }: PreviewProps) {
                   {content.type === 'IMAGE' && (
                     <>
                       <figure className="text-center">
-                        <img
+                        <Image
                           src={content.content}
                           alt={content.metadata?.caption || ''}
                           className="rounded-xl mx-auto max-w-full h-auto"

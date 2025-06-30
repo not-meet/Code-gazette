@@ -13,7 +13,7 @@ interface BlogContentInput {
 interface BlogInput {
   title: string;
   slug: string;
-  thumbnail?: string;
+  blog_thumbnail?: string;
   contents: BlogContentInput[];
 }
 
@@ -25,7 +25,7 @@ export async function POST(request: Request) {
   }
 
   const body: BlogInput = await request.json();
-  const { title, slug, thumbnail, contents } = body;
+  const { title, slug, blog_thumbnail, contents } = body;
 
   if (!title || !slug || !contents || !Array.isArray(contents)) {
     return NextResponse.json({ error: 'Invalid input' }, { status: 400 });
@@ -45,7 +45,7 @@ export async function POST(request: Request) {
           title,
           slug,
           author_id: user.id,
-          blog_thumbnail: thumbnail,
+          blog_thumbnail: blog_thumbnail,
         },
       });
 

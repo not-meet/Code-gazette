@@ -1,4 +1,3 @@
-// app/api/user/avatar/route.ts
 import { prisma } from '@/lib/db';
 import { createClient } from '@/utils/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
@@ -14,7 +13,7 @@ export async function GET(request: NextRequest) {
 
     // Check if user is not authenticated
     if (!data?.user || error || !data.user.email) {
-      return NextResponse.json({ avatar_url: null }, { status: 401 });
+      return NextResponse.json({ avatar_url: null, role: null }, { status: 401 });
     }
 
     const userId = data.user.id;
@@ -26,16 +25,17 @@ export async function GET(request: NextRequest) {
       },
       select: {
         avatar_url: true,
+        role: true,
       },
     });
 
     // Return avatar_url (could be null if not set in DB)
-    return NextResponse.json({ avatar_url: user?.avatar_url || null }, { status: 200 });
+    return NextResponse.json({ avatar_url: user?.avatar_url || null, role: user?.role || null }, { status: 200 });
 
   } catch (error) {
     console.error('Error fetching avatar:', error);
     return NextResponse.json(
-      { error: 'Internal server error', avatar_url: null },
+      { error: 'Internal server error', avatar_url: null, role: null },
       { status: 500 }
     );
   }

@@ -8,6 +8,7 @@ export async function GET() {
         id: true,
         title: true,
         slug: true,
+        blog_thumbnail: true,
         author: {
           select: { name: true },
         },

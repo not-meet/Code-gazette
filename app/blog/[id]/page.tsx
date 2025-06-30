@@ -1,5 +1,8 @@
+import { CommentSection } from '@/components/CommentsSection';
 import { CodeBlock } from '@/components/ui/code-block';
+import { VoteButton } from '@/components/VoteButton';
 import axios from 'axios';
+import Image from 'next/image';
 import { notFound } from 'next/navigation';
 
 type BlogContent = {
@@ -14,6 +17,7 @@ type Blog = {
   id: string;
   title: string;
   slug: string;
+  votes: number;
   author: { name: string; avatar_url?: string };
   contents: BlogContent[];
 };
@@ -21,17 +25,18 @@ type Blog = {
 const Base_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
 async function fetchBlog(id: string): Promise<Blog | null> {
-  const response = await axios.get(`${Base_URL}/api/blog?blogId=${id}`);
-
-  if (!response) {
+  try {
+    const response = await axios.get(`${Base_URL}/api/blog?blogId=${id}`);
+    return response.data || null;
+  } catch (error) {
+    console.error('Error fetching blog:', error);
     return null;
   }
-
-  return response.data;
 }
 
 export default async function BlogPage({ params }: { params: { id: string } }) {
-  const blog = await fetchBlog(params.id);
+  const { id } = await params;
+  const blog = await fetchBlog(id);
 
   if (!blog) {
     notFound();
@@ -39,7 +44,11 @@ export default async function BlogPage({ params }: { params: { id: string } }) {
 
   return (
     <article className="w-full max-w-3xl mx-auto py-12 px-4 text-gray-200 overflow-x-hidden">
-      <h1 className="text-4xl font-bold text-center mb-8">{blog.title}</h1>
+      <div className="flex justify-between items-center mb-8">
+        <VoteButton blogId={blog.id} initialVotes={blog.votes} />
+        <h1 className="text-4xl font-bold text-center">{blog.title}</h1>
+        <div className="w-24" />
+      </div>
       <div className="prose prose-invert prose-lg mx-auto w-full max-w-none px-4">
         {blog.contents.map((content) => (
           <div key={content.id} className="mb-6">
@@ -65,7 +74,9 @@ export default async function BlogPage({ params }: { params: { id: string } }) {
             {content.type === 'IMAGE' && (
               <>
                 <figure className="text-center">
-                  <img
+                  <Image
+                    width={500}
+                    height={500}
                     src={content.content}
                     alt={content.metadata?.caption || ''}
                     className="rounded-xl mx-auto w-full max-w-full h-auto object-contain"
@@ -87,6 +98,7 @@ export default async function BlogPage({ params }: { params: { id: string } }) {
           - {blog.author.name}
         </p>
       </footer>
+      <CommentSection blogId={blog.id} />
     </article>
   );
 }

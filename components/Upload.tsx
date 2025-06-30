@@ -34,7 +34,7 @@ interface FormData {
 }
 
 interface UploadProps {
-  onPreview: (data: { title: string; contents: BlogContent[]; authorName: string }) => void;
+  onPreview: (data: { title: string; contents: BlogContent[]; authorName: string; blog_thumbnail?: string }) => void;
   authorName: string;
 }
 
@@ -50,6 +50,8 @@ export function Upload({ onPreview, authorName }: UploadProps) {
   const [contentType, setContentType] = useState<
     'HEADING' | 'SUBHEADING' | 'PARAGRAPH' | 'CODE_SNIPPET' | 'IMAGE'
   >('PARAGRAPH');
+  const [hasThumbnail, setHasThumbnail] = useState<boolean>(false); // Track thumbnail upload
+
   const { control, handleSubmit, resetField, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: {
@@ -61,7 +63,7 @@ export function Upload({ onPreview, authorName }: UploadProps) {
     },
   });
 
-  const saveToLocalStorage = useCallback((data: { title: string; contents: BlogContent[] }) => {
+  const saveToLocalStorage = useCallback((data: { title: string; contents: BlogContent[]; blog_thumbnail?: string }) => {
     localStorage.setItem('blogDraft', JSON.stringify(data));
     onPreview({ ...data, authorName });
   }, [authorName, onPreview]);
@@ -79,6 +81,7 @@ export function Upload({ onPreview, authorName }: UploadProps) {
       title: data.title || draft.title || '',
       slug: data.slug || draft.slug || '',
       contents: [...(draft.contents || []), newContent],
+      blog_thumbnail: draft.blog_thumbnail || undefined, // Preserve thumbnail
     };
 
     saveToLocalStorage(updatedDraft);
@@ -90,7 +93,7 @@ export function Upload({ onPreview, authorName }: UploadProps) {
   const handleUpload = async () => {
     const draft = JSON.parse(localStorage.getItem('blogDraft') || '{}');
     if (!draft.title || !draft.slug || !draft.contents) {
-      alert('Please add title, slug, and at least onecontent item');
+      alert('Please add title, slug, and at least one content item');
       return;
     }
     const Base_URL = process.env.NEXT_PUBLIC_BASE_URL;
@@ -107,6 +110,7 @@ export function Upload({ onPreview, authorName }: UploadProps) {
       }
 
       localStorage.removeItem('blogDraft');
+      setHasThumbnail(false); 
       alert('Blog uploaded successfully!');
       resetField('title');
       resetField('slug');
@@ -120,7 +124,7 @@ export function Upload({ onPreview, authorName }: UploadProps) {
     }
   };
 
-  const handleFileUpload = async (files: File[]) => {
+  const handleFileUpload = async (files: File[], isThumbnail: boolean = false) => {
     const file = files[0];
     if (!file) return;
 
@@ -139,31 +143,37 @@ export function Upload({ onPreview, authorName }: UploadProps) {
       }
 
       const { url } = await response.json();
-      
-      // Get current draft from local storage
       const draft = JSON.parse(localStorage.getItem('blogDraft') || '{}');
-      
-      // Create new image content
-      const newContent: BlogContent = {
-        type: 'IMAGE',
-        content: url,
-        order: (draft.contents?.length || 0) + 1,
-        metadata: { caption: '' } // Initialize with empty caption
-      };
 
-      // Update draft with new content
-      const updatedDraft = {
-        title: draft.title || '',
-        slug: draft.slug || '',
-        contents: [...(draft.contents || []), newContent]
-      };
+      if (isThumbnail) {
+        // Handle thumbnail upload
+        const updatedDraft = {
+          title: draft.title || '',
+          slug: draft.slug || '',
+          contents: draft.contents || [],
+          blog_thumbnail: url,
+        };
+        setHasThumbnail(true); 
+        saveToLocalStorage(updatedDraft);
+      } else {
+        // Handle regular image content
+        const newContent: BlogContent = {
+          type: 'IMAGE',
+          content: url,
+          order: (draft.contents?.length || 0) + 1,
+          metadata: { caption: '' },
+        };
 
-      // Save to local storage and update preview
-      saveToLocalStorage(updatedDraft);
-      
-      // Reset the caption field
-      resetField('caption');
-      
+        const updatedDraft = {
+          title: draft.title || '',
+          slug: draft.slug || '',
+          contents: [...(draft.contents || []), newContent],
+          blog_thumbnail: draft.blog_thumbnail || undefined, // Preserve thumbnail
+        };
+
+        saveToLocalStorage(updatedDraft);
+        resetField('caption');
+      }
     } catch (error) {
       console.error('Error uploading image:', error);
       alert('Failed to upload image');
@@ -315,7 +325,15 @@ export function Upload({ onPreview, authorName }: UploadProps) {
             {errors.content && <p className="text-red-400 text-sm mt-1">{errors.content.message}</p>}
           </TabsContent>
           <TabsContent value="IMAGE" className="mt-4">
-            <FileUpload onChange={handleFileUpload} />
+            {!hasThumbnail ? (
+              <div className="mb-2">
+                <FileUpload onChange={(files) => handleFileUpload(files, true)} />
+              </div>
+            ) : (
+              <div className="mb-2">
+                <FileUpload onChange={(files) => handleFileUpload(files, false)} />
+              </div>
+            )}
             <Controller
               name="caption"
               control={control}

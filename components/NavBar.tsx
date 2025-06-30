@@ -8,21 +8,24 @@ import { createClient } from "@/utils/supabase/client";
 import { ShimmerButton } from "@/components/magicui/shimmer-button";
 import { AuroraText } from "@/components/magicui/aurora-text";
 
-// Interface for avatar response
-interface AvatarResponse {
+// Interface for user profile response
+interface UserProfileResponse {
   avatar_url: string | null;
+  role: string | null;
 }
 
 // Interface for cached user data in local storage
 interface CachedUserData {
   email: string;
   avatar_url: string | null;
+  role: string | null;
 }
 
 const Navbar = () => {
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [userRole, setUserRole] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -60,6 +63,7 @@ const Navbar = () => {
             const parsedData: CachedUserData = JSON.parse(cachedData);
             if (parsedData.avatar_url) {
               setAvatarUrl(parsedData.avatar_url);
+              setUserRole(parsedData.role);
               setLoading(false);
               return;
             }
@@ -68,13 +72,18 @@ const Navbar = () => {
           // If no cached data, fetch from API
           try {
             const response = await axios.get('/api/user/profile');
-            const data: AvatarResponse = response.data;
+            const data: UserProfileResponse = response.data;
             setAvatarUrl(data.avatar_url);
+            setUserRole(data.role);
 
             // Cache the data in local storage
             localStorage.setItem(
               `user_data_${user.email}`,
-              JSON.stringify({ email: user.email, avatar_url: data.avatar_url })
+              JSON.stringify({
+                email: user.email,
+                avatar_url: data.avatar_url,
+                role: data.role
+              })
             );
           } catch (error) {
             console.error('Failed to fetch avatar:', error);
@@ -130,8 +139,21 @@ const Navbar = () => {
           </AuroraText>
         </Link>
 
-        {/* Right: Profile or Sign Up */}
+        {/* Right: Create Button and Profile */}
         <div className="flex items-center gap-4">
+          {userRole == 'WRITER' && (
+            <Link href="/create" className="inline-block">
+              <ShimmerButton className="shadow-2xl">
+                <span className="whitespace-pre-wrap text-center text-sm font-medium leading-none tracking-tight text-gray-200 dark:from-white dark:to-slate-900/10 font-mono flex items-center gap-2">
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+                  </span>
+                  Create
+                </span>
+              </ShimmerButton>
+            </Link>
+          )}
           {loading ? (
             <div className="w-8 h-8 rounded-full bg-gray-200 animate-pulse" />
           ) : isAuthenticated && avatarUrl ? (
