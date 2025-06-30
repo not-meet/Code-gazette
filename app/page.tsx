@@ -15,8 +15,7 @@ export default async function Home() {
   return (
     <div className="w-full max-w-5xl mx-auto py-12 px-4">
       <header className="mb-12 text-center">
-        <h1 className="font-semibold text-gray-100 text-5xl">Tech Letters</h1>
-        <p className="text-amber-100 text-2xl mt-2 font-signature">Hey there, it’s the first time building stuff</p>
+        <h1 className="font-semibold text-gray-400 text-5xl">All the Tech Blogs!</h1>
       </header>
       <div className="w-full space-y-6">
         {blogs.length > 0 ? (

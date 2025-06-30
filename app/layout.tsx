@@ -3,6 +3,7 @@ import { Courier_Prime, Geist, Corinthia, Geist_Mono, Libre_Baskerville } from "
 import "./globals.css";
 import Navbar from "@/components/NavBar";
 import { ScrollProgress } from "@/components/magicui/scroll-progress";
+import Pathname from "@/components/PathName";
 
 // const geistSans = Geist({
 //   variable: "--font-geist-sans",
@@ -48,7 +49,7 @@ export default function RootLayout({
       <body
         className={`${libreBaskerville.className} ${courierPrime.className} ${corinthia.className} antialiased bg-gradient-to-b from-[#0b0d0e] to-[#090b0c] overflow-auto`}
       >
-        <Navbar />
+        <Pathname />
         <ScrollProgress className="rounded-full bg-gradient-to-br from-white via-gray-300 to-amber-300" />
         {children}
       </body>
