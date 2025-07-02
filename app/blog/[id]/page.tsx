@@ -34,6 +34,33 @@ async function fetchBlog(id: string): Promise<Blog | null> {
   }
 }
 
+// Helper function to parse PARAGRAPH content and convert ``url`` to a link
+function parseParagraphContent(content: string) {
+  const urlPattern = /``(.*?)``/g;
+  if (!urlPattern.test(content)) {
+    return <span>{content}</span>;
+  }
+
+  const parts = content.split(urlPattern);
+  return parts.map((part, index) => {
+    if (index % 2 === 1) {
+      // This is the URL inside ``url``
+      return (
+        <a
+          key={index}
+          href={part}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-amber-300 text-2xl font-signature hover:underline"
+        >
+          Click here
+        </a>
+      );
+    }
+    return <span key={index}>{part}</span>;
+  });
+}
+
 export default async function BlogPage({ params }: { params: { id: string } }) {
   const { id } = await params;
   const blog = await fetchBlog(id);
@@ -59,7 +86,9 @@ export default async function BlogPage({ params }: { params: { id: string } }) {
               <h3 className="text-2xl font-sans font-medium">{content.content}</h3>
             )}
             {content.type === 'PARAGRAPH' && (
-              <p className="text-lg leading-relaxed">{content.content}</p>
+              <p className="text-lg leading-relaxed">
+                {parseParagraphContent(content.content)}
+              </p>
             )}
             {content.type === 'CODE_SNIPPET' && (
               <>
