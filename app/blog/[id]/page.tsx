@@ -61,7 +61,12 @@ function parseParagraphContent(content: string) {
   });
 }
 
-export default async function BlogPage({ params }: { params: { id: string } }) {
+// Fix the type definition for Next.js 15
+type PageProps = {
+  params: Promise<{ id: string }>;
+};
+
+export default async function BlogPage({ params }: PageProps) {
   const { id } = await params;
   const blog = await fetchBlog(id);
 
