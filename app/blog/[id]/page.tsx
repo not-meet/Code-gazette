@@ -75,7 +75,7 @@ export default async function BlogPage({ params }: PageProps) {
   }
 
   return (
-    <article className="w-full max-w-3xl mx-auto py-12 px-4 text-gray-200 overflow-x-hidden">
+    <article className="w-full max-w-3xl mx-auto py-6 md:py-12 px-2 md:px-4 text-gray-200 overflow-x-hidden">
       <div className="flex justify-between items-center mb-8">
         {/* VoteButton - Hidden on mobile */}
         <div className="hidden md:block">
@@ -84,7 +84,7 @@ export default async function BlogPage({ params }: PageProps) {
         {/* Empty spacer for mobile to center the title */}
         <div className="w-24 md:hidden" />
 
-        <h1 className="text-4xl font-bold text-center">{blog.title}</h1>
+        <h1 className="text-2xl md:text-4xl font-bold text-center px-2 break-words">{blog.title}</h1>
         <div className="w-24" />
       </div>
       <div className="prose prose-invert prose-lg mx-auto w-full max-w-none px-4">
