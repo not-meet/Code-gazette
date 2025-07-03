@@ -5,7 +5,7 @@ export async function getAllBlogs() {
   try {
     const response = await fetch(`${Base_URL}/api/allblogs`, {
       cache: 'force-cache', // Cache the response until manually invalidated
-      next: { revalidate: 3600 }, // Revalidate every hour (optional)
+      next: { revalidate: 900 }, // Revalidate every hour (optional)
     });
     if (!response.ok) {
       throw new Error('Failed to fetch blogs');
