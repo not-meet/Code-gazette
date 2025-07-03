@@ -1,6 +1,5 @@
 'use client';
-
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { Button } from '@/components/ui/button';
 import { createClient } from '@/utils/supabase/client';
 import { useSearchParams } from 'next/navigation';
@@ -10,7 +9,30 @@ import { TypingAnimation } from '@/components/magicui/typing-animation';
 import { ShimmerButton } from '@/components/magicui/shimmer-button';
 import Link from 'next/link';
 
-export default function SignInPage() {
+// Loading fallback component
+function SignInLoading() {
+  return (
+    <div className="flex min-h-screen overflow-y-hidden">
+      {/* Left Section: Image */}
+      <div className="w-1/2 relative hidden md:block">
+        <div className="w-full h-full bg-gray-300 animate-pulse" />
+      </div>
+
+      {/* Right Section: Loading Content */}
+      <div className="w-full md:w-1/2 flex items-center justify-center p-6">
+        <div className="text-center space-y-6 max-w-md">
+          <div className="h-12 bg-gray-300 rounded animate-pulse mb-4"></div>
+          <div className="h-20 bg-gray-300 rounded animate-pulse mb-6"></div>
+          <div className="h-12 bg-gray-300 rounded animate-pulse mb-4"></div>
+          <div className="h-10 bg-gray-300 rounded animate-pulse"></div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Component that uses useSearchParams
+function SignInContent() {
   const [isGoogleLoading, setIsGoogleLoading] = useState<boolean>(false);
   const supabase = createClient();
   const searchParams = useSearchParams();
@@ -25,7 +47,6 @@ export default function SignInPage() {
           redirectTo: `${window.location.origin}/auth/callback${next ? `?next=${encodeURIComponent(next)}` : ''}`,
         },
       });
-
       if (error) {
         throw error;
       }
@@ -81,5 +102,14 @@ export default function SignInPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+// Main component with Suspense boundary
+export default function SignInPage() {
+  return (
+    <Suspense fallback={<SignInLoading />}>
+      <SignInContent />
+    </Suspense>
   );
 }
