@@ -47,7 +47,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${libreBaskerville.className} ${courierPrime.className} ${corinthia.className} antialiased bg-gradient-to-b from-[#0b0d0e] to-[#090b0c] overflow-auto`}
+        className={`${libreBaskerville.className} ${courierPrime.className} ${corinthia.className} antialiased bg-gradient-to-b from-[#0b0d0e] to-[#090b0c] min-h-screen w-full fixed overflow-y-auto`}
       >
         <Pathname />
         <ScrollProgress className="rounded-full bg-gradient-to-br from-white via-gray-300 to-amber-300" />

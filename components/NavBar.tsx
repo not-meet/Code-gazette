@@ -141,8 +141,9 @@ const Navbar = () => {
 
         {/* Right: Create Button and Profile */}
         <div className="flex items-center gap-4">
+          {/* Create Button - Hidden on mobile */}
           {userRole == 'WRITER' && (
-            <Link href="/create" className="inline-block">
+            <Link href="/create" className="hidden md:inline-block">
               <ShimmerButton className="shadow-2xl">
                 <span className="whitespace-pre-wrap text-center text-sm font-medium leading-none tracking-tight text-gray-200 dark:from-white dark:to-slate-900/10 font-mono flex items-center gap-2">
                   <span className="relative flex h-2 w-2">
@@ -182,7 +183,8 @@ const Navbar = () => {
             </div>
           ) : (
             <div className="flex items-center gap-4">
-              <Link href="/signin" className="inline-block">
+              {/* Sign In Button - Hidden on mobile */}
+              <Link href="/signin" className="hidden md:inline-block">
                 <ShimmerButton className="shadow-2xl">
                   <span className="whitespace-pre-wrap text-center text-sm font-medium leading-none tracking-tight text-gray-200 dark:from-white dark:to-slate-900/10 font-mono">
                     Sign In
