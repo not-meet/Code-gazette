@@ -75,70 +75,76 @@ export default async function BlogPage({ params }: PageProps) {
   }
 
   return (
-    <article className="w-full max-w-3xl mx-auto py-6 md:py-12 px-2 md:px-4 text-gray-200 overflow-x-hidden">
-      <div className="flex justify-between items-center mb-8">
-        {/* VoteButton - Hidden on mobile */}
-        <div className="hidden md:block">
-          <VoteButton blogId={blog.id} initialVotes={blog.votes} />
-        </div>
-        {/* Empty spacer for mobile to center the title */}
-        <div className="w-24 md:hidden" />
-
-        <h1 className="text-2xl md:text-4xl font-bold text-center px-2 break-words">{blog.title}</h1>
-        <div className="w-24" />
-      </div>
-      <div className="prose prose-invert prose-lg mx-auto w-full max-w-none px-4">
-        {blog.contents.map((content) => (
-          <div key={content.id} className="mb-6">
-            {content.type === 'HEADING' && (
-              <h2 className="text-3xl font-sans font-semibold">{content.content}</h2>
-            )}
-            {content.type === 'SUBHEADING' && (
-              <h3 className="text-2xl font-sans font-medium">{content.content}</h3>
-            )}
-            {content.type === 'PARAGRAPH' && (
-              <p className="text-lg leading-relaxed">
-                {parseParagraphContent(content.content)}
-              </p>
-            )}
-            {content.type === 'CODE_SNIPPET' && (
-              <>
-                <CodeBlock
-                  code={content.content}
-                  language={content.metadata?.language || 'javascript'}
-                  filename={content.metadata?.caption || ''}
-                />
-                <hr className="my-4 border-t border-gray-700 opacity-50 mx-auto w-1/2 fading-line" />
-              </>
-            )}
-            {content.type === 'IMAGE' && (
-              <>
-                <figure className="text-center">
-                  <Image
-                    width={500}
-                    height={500}
-                    src={content.content}
-                    alt={content.metadata?.caption || ''}
-                    className="rounded-xl mx-auto w-full max-w-full h-auto object-contain"
-                  />
-                  {content.metadata?.caption && (
-                    <figcaption className="text-sm text-gray-400 mt-2">
-                      {content.metadata.caption}
-                    </figcaption>
-                  )}
-                </figure>
-                <hr className="my-4 border-t border-gray-700 opacity-50 mx-auto w-1/2 fading-line" />
-              </>
-            )}
+    <div className="min-h-screen overflow-x-hidden">
+      <div className="w-full px-2 sm:px-4">
+        <div className="max-w-5xl mx-auto flex">
+          {/* Vote Button - Left side */}
+          <div className="hidden sm:block mr-4 pt-12">
+            <VoteButton blogId={blog.id} initialVotes={blog.votes} />
           </div>
-        ))}
+
+          <article className="w-full max-w-3xl py-6 md:py-12 px-2 text-gray-200 mx-auto">
+        <div className="mb-8">
+          <h1 className="text-2xl md:text-4xl font-bold text-center px-2 break-words">{blog.title}</h1>
+        </div>
+
+        <div className="prose prose-invert prose-lg mx-auto w-full max-w-none px-4">
+          {blog.contents.map((content) => (
+            <div key={content.id} className="mb-6">
+              {content.type === 'HEADING' && (
+                <h2 className="text-3xl font-sans font-semibold">{content.content}</h2>
+              )}
+              {content.type === 'SUBHEADING' && (
+                <h3 className="text-2xl font-sans font-medium">{content.content}</h3>
+              )}
+              {content.type === 'PARAGRAPH' && (
+                <p className="text-lg leading-relaxed">
+                  {parseParagraphContent(content.content)}
+                </p>
+              )}
+              {content.type === 'CODE_SNIPPET' && (
+                <>
+                  <CodeBlock
+                    code={content.content}
+                    language={content.metadata?.language || 'javascript'}
+                    filename={content.metadata?.caption || ''}
+                  />
+                  <hr className="my-4 border-t border-gray-700 opacity-50 mx-auto w-1/2 fading-line" />
+                </>
+              )}
+              {content.type === 'IMAGE' && (
+                <>
+                  <figure className="text-center">
+                    <Image
+                      width={500}
+                      height={500}
+                      src={content.content}
+                      alt={content.metadata?.caption || ''}
+                      className="rounded-xl mx-auto w-full max-w-full h-auto object-contain"
+                    />
+                    {content.metadata?.caption && (
+                      <figcaption className="text-sm text-gray-400 mt-2">
+                        {content.metadata.caption}
+                      </figcaption>
+                    )}
+                  </figure>
+                  <hr className="my-4 border-t border-gray-700 opacity-50 mx-auto w-1/2 fading-line" />
+                </>
+              )}
+            </div>
+          ))}
+        </div>
+
+        <footer className="mt-12 text-right">
+          <p className="text-2xl font-signature text-amber-200">
+            - {blog.author.name}
+          </p>
+        </footer>
+
+        <CommentSection blogId={blog.id} />
+          </article>
+        </div>
       </div>
-      <footer className="mt-12 text-right">
-        <p className="text-2xl font-signature text-amber-200">
-          - {blog.author.name}
-        </p>
-      </footer>
-      <CommentSection blogId={blog.id} />
-    </article>
+    </div>
   );
 }

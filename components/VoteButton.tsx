@@ -91,7 +91,7 @@ export function VoteButton({ blogId, initialVotes }: VoteButtonProps) {
   };
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex flex-col items-center gap-1">
       <button
         onClick={() => handleVote(true)}
         disabled={isLoading}
